@@ -11,7 +11,8 @@ const {
 const { PromptTemplate } = require("@langchain/core/prompts");
 const { loadQAChain } = require("langchain/chains");
 const bodyParser = require("body-parser");
-
+const hostname = "0.0.0.0";
+const port = 3000;
 const app = express();
 app.use(bodyParser.json());
 app.use("/", express.static("public"));
@@ -110,6 +111,6 @@ app.post("/response-text", async (req, res) => {
   }
 });
 
-app.listen(3000, () => {
-  console.log("API WRKing on 3000 port");
+app.listen(port, hostname, () => {
+  console.log(`API WRKing on ${hostname}:${port} `);
 });
