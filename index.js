@@ -4,11 +4,12 @@ const { config } = require("dotenv");
 const PdfParse = require("pdf-parse");
 const { FaissStore } = require("@langchain/community/vectorstores/faiss");
 const { RecursiveCharacterTextSplitter } = require("langchain/text_splitter");
-const { GoogleGenerativeAIEmbeddings } = require("@langchain/google-genai");
-const { ChatGoogleGenerativeAI } = require("@langchain/google-genai");
+const {
+  GoogleGenerativeAIEmbeddings,
+  ChatGoogleGenerativeAI,
+} = require("@langchain/google-genai");
 const { PromptTemplate } = require("@langchain/core/prompts");
 const { loadQAChain } = require("langchain/chains");
-const { GoogleGenerativeAI } = require("@google/generative-ai");
 const bodyParser = require("body-parser");
 
 const app = express();
@@ -42,11 +43,6 @@ app.post("/extract-text", async (req, res) => {
         "Your pdf loaded successfully ,now you can go ahead and ask questions about it,but please be specific to question";
       console.log("in req");
       res.json({ answer: responseData });
-      // chunks.forEach((chunk, index) => {
-      //   res.write(`Chunk ${index + 1}:\n`);
-      //   res.write(JSON.stringify(chunk) + "\n");
-      // });
-      // res.end();
     } catch (error) {
       console.log("err");
       console.error("Error processing text:", error);
@@ -71,8 +67,6 @@ app.post("/response-text", async (req, res) => {
       model: "gemini-pro",
       apiKey: apiKey,
       temperature: 0.3,
-      // topK: 1,
-      // topP: 1,
       maxOutputTokens: 2048,
     });
 
@@ -99,49 +93,9 @@ app.post("/response-text", async (req, res) => {
 
     const userquest = req.body.question;
     const docs = await db.similaritySearch(userquest);
-
-    //console.log(docs);
-    // const pageContents = docs.map((doc) => doc.pageContent);
-
-    // const genAI = new GoogleGenerativeAI(process.env.API_KEY);
-    // const model = genAI.getGenerativeModel({ model: "gemini-1.0-pro" });
-    // const chat = model.startChat({
-    //   history: [
-    //     {
-    //       role: "user",
-    //       parts: pageContents,
-    //     },
-    //     {
-    //       role: "model",
-    //       parts:
-    //         "Great to meet you.,ask only from provided context, What would you like to know from provided context? also give answer refering provided context only",
-    //     },
-    //   ],
-    //   generationConfig: {
-    //     maxOutputTokens: 2048,
-    //     temperature: 0.1,
-    //   },
-    // });
-
-    // const msg =
-    //   "Can you give me an example from history where the enemy was crushed totally from the book?";
-
-    // const result = await chat.sendMessage(msg);
-    // const response = result.response;
-
-    // const text = response.text();
-    // console.log("1sts");
-    // console.log(text);
-    //
-    //
-    //
-
     const chain = getConversation();
-
     await logResponse(docs, userquest);
     async function logResponse(docs, userquest) {
-      console.log("in here");
-
       const response1 = await chain.invoke(
         {
           input_documents: docs,
